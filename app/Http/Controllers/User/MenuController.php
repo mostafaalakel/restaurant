@@ -25,9 +25,13 @@ class MenuController extends Controller
 
     public function showFoodOfCategory($category_id)
     {
-        $foods =  FoodResource::collection(Food::where('category_id', $category_id)->get());
-        return $this->retrievedResponse($foods, 'foods retrieved successfully');
+        $foods = Food::where('category_id', $category_id)
+            ->with('reviews')
+            ->get()
+            ->sortByDesc('average_rating'); // this is Accessor in Food Model (getAverageRatingAttribute)
+
+        $foodResources = FoodResource::collection($foods);
+
+        return $this->retrievedResponse($foodResources, 'foods retrieved and sorted by average rating successfully');
     }
 }
-
-
