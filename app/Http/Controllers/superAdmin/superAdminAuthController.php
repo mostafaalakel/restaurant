@@ -49,11 +49,6 @@ class superAdminAuthController extends Controller
         return $this->apiResponse(200, 'You are logged in successfully', $data);
     }
 
-    public function me()
-    {
-        $superAdmin_info = new UserResource(Auth::guard('superAdmin')->user());
-        return $this->apiResponse(200, 'superAdmin information retrieved successfully', $superAdmin_info);
-    }
 
     public function register(Request $request)
     {

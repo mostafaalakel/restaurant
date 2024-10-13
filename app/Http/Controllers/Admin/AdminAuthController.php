@@ -49,11 +49,6 @@ class AdminAuthController extends Controller
         return $this->apiResponse(200, 'You are logged in successfully', $data);
     }
 
-    public function me()
-    {
-        $admin_info = new UserResource(Auth::guard('admin')->user());
-        return $this->apiResponse(200, 'Admin information retrieved successfully', $admin_info);
-    }
 
     public function register(Request $request)
     {
