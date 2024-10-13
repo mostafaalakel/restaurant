@@ -28,7 +28,7 @@ trait FoodTrait
         }
 
         $image = $request->file('image');
-        $image_name = date('YmdHi') . $image->getClientOriginalName();
+        $image_name = date('YmdHis') . $image->getClientOriginalName();
         $image->move(public_path('upload/food_images'), $image_name);
 
         $food = Food::create([
@@ -77,7 +77,7 @@ trait FoodTrait
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $image_name = date('YmdHi') . $image->getClientOriginalName();
+            $image_name = date('YmdHis') . $image->getClientOriginalName();
             $image->move(public_path('upload/food_images'), $image_name);
 
             if (file_exists(public_path('upload/food_images/' . $food->image))) {

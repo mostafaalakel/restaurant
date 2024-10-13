@@ -41,7 +41,7 @@ Route::get('/food/details/{id}', [FoodController::class, 'FoodDetails']);
 
 Route::group(["prefix" => 'menu'], function () {
     Route::get('/category', [MenuController::class, 'showCategories']);
-    Route::get('/foods/{category_id}', [MenuController::class, 'showFoodOfCategory']);    
+    Route::get('/foods/{category_id}', [MenuController::class, 'showFoodOfCategory']);
 });
 
 

@@ -23,9 +23,9 @@ trait OrderTrait
         return $this->retrievedResponse($orders, 'orders retrieved successfully');
     }
 
-    public function orderDetails($id)
+    public function orderDetails($order_id)
     {
-        $orderItems = OrderItem::where('order_id', $id)->with('food')->get();
+        $orderItems = OrderItem::where('order_id', $order_id)->with('food')->get();
         if ($orderItems->isEmpty()) {
             return $this->notFoundResponse('Order has no items');
         }
