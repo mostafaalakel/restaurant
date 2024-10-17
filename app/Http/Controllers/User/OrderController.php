@@ -32,8 +32,7 @@ class OrderController extends Controller
             'address' => 'required',
             'town' => 'required',
             'zipCode' => 'required',
-            'phone_number' => 'required',
-            'total_price' => 'required|numeric',
+            'phone_number' => 'required'
         ];
 
         $validate = Validator::make($request->all(), $rules);
@@ -66,14 +65,23 @@ class OrderController extends Controller
             }
         } catch (Exception $e) {
             DB::rollback();
-            $order->payment_status = 'pending';
-            $order->save();
+            if (isset($order)) {
+                $order->payment_status = 'pending';
+                $order->save();
+            }
             return $this->apiResponse('error', $e->getMessage(), null, 500);
         }
     }
 
     private function createNewOrder(Request $request)
     {
+        $total_price = Cart::where('user_id', Auth::id())->first()
+            ->cartItems()
+            ->get()
+            ->sum(
+                fn($item) => $item->quantity * $item->food->price
+            );
+
         return Order::create([
             'user_id' => Auth::id(),
             'country' => $request->country,
@@ -81,7 +89,7 @@ class OrderController extends Controller
             'town' => $request->town,
             'zipCode' => $request->zipCode,
             'phone_number' => $request->phone_number,
-            'total_price' => $request->total_price,
+            'total_price' => $total_price,
         ]);
     }
 
