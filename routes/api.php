@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\FoodController;
-use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\UserAuthController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\ReviewController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -46,11 +46,11 @@ Route::group(["prefix" => 'menu'], function () {
 
 
 Route::group(["prefix" => 'user'], function () {
-    Route::post('login', [UserController::class, 'login']);
-    Route::post('register', [UserController::class, 'register']);
-    Route::middleware('auth:user')->get('me', [UserController::class, 'me']);
-    Route::middleware('auth:user')->post('logout', [UserController::class, 'logout']);
-    Route::middleware('auth:user')->post('refresh', [UserController::class, 'refresh']);
+    Route::post('login', [UserAuthController::class, 'login']);
+    Route::post('register', [UserAuthController::class, 'register']);
+    Route::middleware('auth:user')->get('me', [UserAuthController::class, 'me']);
+    Route::middleware('auth:user')->post('logout', [UserAuthController::class, 'logout']);
+    Route::middleware('auth:user')->post('refresh', [UserAuthController::class, 'refresh']);
 });
 
 

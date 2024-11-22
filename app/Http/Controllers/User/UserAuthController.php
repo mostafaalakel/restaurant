@@ -13,7 +13,7 @@ use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
-class UserController extends Controller
+class UserAuthController extends Controller
 {
     use ApiResponseTrait;
 
