@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Models\User;
 use App\Events\CartEvent;
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Socialite\Facades\Socialite;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class UserAuthController extends Controller
@@ -39,7 +41,7 @@ class UserAuthController extends Controller
 
         $data = [
             'user' => $user,
-            'authorization' =>  [
+            'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
                 'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -76,7 +78,7 @@ class UserAuthController extends Controller
 
         $data = [
             'user' => $user,
-            'authorization' =>  [
+            'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
                 'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -91,7 +93,7 @@ class UserAuthController extends Controller
         try {
             Auth::guard('user')->logout();
             return $this->apiResponse(200, 'User logged out successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->apiResponse(500, 'Something went wrong', []);
         }
     }
@@ -102,4 +104,50 @@ class UserAuthController extends Controller
             'token' => Auth::guard('user')->refresh()
         ]);
     }
+
+    public function redirectToGoogle()
+    {
+        $loginUrl = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+
+        return response()->json([
+            'login_url' => $loginUrl,
+        ]);
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $userSocial = Socialite::driver('google')->stateless()->user();
+
+            $user = User::where('email', $userSocial->getEmail())->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $userSocial->getName(),
+                    'email' => $userSocial->getEmail(),
+                    'google_id' => $userSocial->getId(),
+                    'provider' => 'google',
+                ]);
+
+                event(new CartEvent($user));
+            }
+
+            $token = Auth::guard('user')->login($user);
+            $user = new UserResource($user);
+
+            $data = [
+                'user' => $user,
+                'authorization' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
+            ];
+
+            return $this->apiResponse('success', 'You are logged in successfully', $data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Authentication failed'], 401);
+        }
+    }
+
 }

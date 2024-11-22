@@ -52,6 +52,8 @@ Route::group(["prefix" => 'user'], function () {
     Route::middleware('auth:user')->post('logout', [UserAuthController::class, 'logout']);
     Route::middleware('auth:user')->post('refresh', [UserAuthController::class, 'refresh']);
 });
+Route::get('/auth/redirect/google', [UserAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/callback/google', [UserAuthController::class, 'handleGoogleCallback']);
 
 
 // Routes for Admins
