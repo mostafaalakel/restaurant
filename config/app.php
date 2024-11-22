@@ -213,5 +213,5 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
 
     ])->toArray(),
- 
+
 ];
