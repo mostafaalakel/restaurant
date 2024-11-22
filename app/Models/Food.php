@@ -36,6 +36,15 @@ class Food extends Model
     {
         return $this->hasMany(Review::class);
     }
+    public function generalDiscounts()
+    {
+        return $this->belongsToMany(GeneralDiscount::class, 'food_general_discount');
+    }
+
+    public function codeDiscounts()
+    {
+        return $this->belongsToMany(CodeDiscount::class, 'food_code_discount');
+    }
 
     public function getAverageRatingAttribute()
     {

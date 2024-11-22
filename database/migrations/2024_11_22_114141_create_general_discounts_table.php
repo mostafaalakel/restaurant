@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('foods', function (Blueprint $table) {
+        Schema::create('general_discounts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('category_id');
-            $table->decimal('price');
-            $table->string('image');
-            $table->text('description');
-            $table->integer('quantity');
+            $table->decimal('value', 8, 2);
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('foods');
+        Schema::dropIfExists('general_discounts');
     }
 };
