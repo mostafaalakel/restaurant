@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralDiscount extends Model
 {
+    public $translatable = ['name'];
+
     use HasFactory;
     protected $fillable = [
         'name',

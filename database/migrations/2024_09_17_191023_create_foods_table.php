@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('foods', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->json('name');
             $table->unsignedBigInteger('category_id');
             $table->decimal('price');
             $table->string('image');
-            $table->text('description');
+            $table->json('description');
             $table->integer('quantity');
             $table->timestamps();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');

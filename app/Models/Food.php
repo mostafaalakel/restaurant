@@ -10,11 +10,13 @@ class Food extends Model
 {
     use HasFactory;
     protected $table = 'foods';
+    public $translatable = ['name', 'description'];
     protected $fillable = [
         'name',
         'category_id',
         'price',
         'image',
+        'quantity',
         'description'
     ];
 
