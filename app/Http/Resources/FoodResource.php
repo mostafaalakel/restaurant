@@ -14,15 +14,26 @@ class FoodResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'image' => $this->image,  
+        $data = [
+            'food_id' => $this->id,
+            'food_name' => $this->getTranslation('name' , app()->getLocale()),
             'image_url' => asset(public_path('upload/food_images/'. $this->image)),
-            'description' => $this->description,
-            'price' => $this->price ,
+            'description' => $this->getTranslation('description' , app()->getLocale()),
+            'price' => $this->price ."$" ,
             'average_rating' => $this->average_rating,
-            'reviews' => ReviewResource::collection($this->reviews) 
         ];
+        if($this->generalDiscounts->isNotEmpty()){
+            $data['price_after_discounts'] = $this->price_after_discounts ."$";
+            $data['discounts'] = $this->generalDiscounts->map(function($discount){
+                return [
+                    'id' => $discount->id,
+                    'name' => $discount->getTranslation('name' , app()->getLocale()),
+                    'value' => $discount->value,
+                    'start_date' => $discount->start_date,
+                    'end_date' => $discount->end_date,
+                ];
+            });
+        }
+        return $data;
     }
 }
