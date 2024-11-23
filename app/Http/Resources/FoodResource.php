@@ -26,9 +26,9 @@ class FoodResource extends JsonResource
             $data['price_after_discounts'] = $this->price_after_discounts ."$";
             $data['discounts'] = $this->generalDiscounts->map(function($discount){
                 return [
-                    'id' => $discount->id,
-                    'name' => $discount->getTranslation('name' , app()->getLocale()),
-                    'value' => $discount->value,
+                    'discount_id' => $discount->id,
+                    'discount_name' => $discount->getTranslation('name' , app()->getLocale()),
+                    'discount_value' => $discount->value ."%",
                     'start_date' => $discount->start_date,
                     'end_date' => $discount->end_date,
                 ];

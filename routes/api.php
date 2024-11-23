@@ -8,16 +8,11 @@ use App\Http\Controllers\User\FoodController;
 use App\Http\Controllers\User\UserAuthController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\ReviewController;
-use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\User\ReservationController;
 use App\Http\Controllers\superAdmin\superAdminController;
 use App\Http\Controllers\superAdmin\superAdminAuthController;
-use App\Http\Controllers\Admin\FoodController as AdminFoodController;
-use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\User\MenuController;
 
 /*
@@ -36,10 +31,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/food/details/{id}', [FoodController::class, 'FoodDetails']);
+
+Route::group(["prefix" => 'food' , 'middleware' => 'setLocale'], function () {
+    Route::get('/discounts', [FoodController::class, 'foodDiscount']);
+    Route::get('/filter', [FoodController::class, 'foodFilter']);
+    Route::get('/details/{id}', [FoodController::class, 'FoodDetails']);
+});
 
 
-Route::group(["prefix" => 'menu'], function () {
+Route::group(["prefix" => 'menu' , 'middleware' => 'setLocale'], function () {
     Route::get('/category', [MenuController::class, 'showCategories']);
     Route::get('/foods/{category_id}', [MenuController::class, 'showFoodOfCategory']);
 });

@@ -6,7 +6,8 @@ use App\Models\Review;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Translatable\HasTranslations;
-
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class Food extends Model
 {
@@ -51,11 +52,6 @@ class Food extends Model
         return $this->belongsToMany(CodeDiscount::class, 'food_code_discount');
     }
 
-//    public function getAverageRatingAttribute()
-//    {
-//        return $this->reviews()->avg('rating');
-//    }
-
     public function getCalculatePriceAfterDiscountsAttribute()
     {
         if ($this->generalDiscounts->isNotEmpty()) {
@@ -71,5 +67,21 @@ class Food extends Model
             $price_after_discounts -= $price_after_discounts * ($values_discounts / 100);
         }
         return $price_after_discounts;
+    }
+
+    public function scopeWithAverageRating(Builder $query)
+    {
+        $query->withCount([
+            'reviews as average_rating' => function ($query) {
+                $query->select(DB::raw('coalesce(avg(rating), 0)'));
+            }
+        ])->orderByDesc('average_rating');
+    }
+
+    public function scopeWithGeneralDiscounts(Builder $query)
+    {
+        $query->with(['generalDiscounts' => function ($query) {
+            $query->where('is_active', 1)->where('start_date', '<=', now())->where('end_date', '>=', now());
+        }]);
     }
 }
