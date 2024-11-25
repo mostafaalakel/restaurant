@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->decimal('value', 8, 2);
-            $table->integer('max_uses')->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('is_active')->default(true);

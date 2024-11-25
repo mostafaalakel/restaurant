@@ -127,6 +127,7 @@ Route::group(['prefix' => 'superAdmin', 'middleware' => 'auth:superAdmin'], func
 // Routes for cart
 Route::group(['prefix' => 'cart', 'middleware' => 'auth:user'], function () {
     Route::post('addToCart', [CartController::class, 'AddToCart']);
+    Route::post('applyDiscountCode', [CartController::class, 'applyDiscountCode']);
     Route::get('showCart', [CartController::class, 'ShowCartInfo']);
     Route::delete('deleteItemCart/{cartItemId}', [CartController::class, 'DeleteItem']);
     Route::patch('updateItemCart/{cartItemId}', [CartController::class, 'UpdateItemQuantity']);
