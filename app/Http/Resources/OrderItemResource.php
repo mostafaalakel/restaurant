@@ -15,13 +15,14 @@ class OrderItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            
-            'id'=> $this->id ,
+
+            'order_item_id'=> $this->id ,
             'quantity'=> $this->quantity ,
-            'price' =>  $this->price."$" ,
+            'price' => $this->price ." $",
+            'price_after_discounts' => $this->price_after_discounts ." $",
             'food' => [
                 'name' => $this->food->name,
-                'image' => $this->food->image,
+                'image_url' => asset(public_path('upload/food_images/'. $this->food->image)),
             ],
         ];
     }

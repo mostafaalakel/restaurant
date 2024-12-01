@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('town');
             $table->string('zipCode');
             $table->string('phone_number');
-            $table->decimal('total_price');
+            $table->decimal('price');
+            $table->decimal('price_after_discounts');
             $table->enum('payment_status', ['pending', 'paid'])->default('pending');
             $table->enum('order_status', ['processing', 'delivered'])->default('processing');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
