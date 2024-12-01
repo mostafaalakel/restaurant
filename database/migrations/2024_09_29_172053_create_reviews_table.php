@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('food_id');
             $table->integer('rating')->between(1, 5);
-            $table->text('comment')->nullable(); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('food_id')->references('id')->on('foods')->onDelete('cascade');
             $table->timestamps();

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('price');
             $table->string('image');
             $table->json('description');
-            $table->integer('quantity');
+            $table->integer('stock');
             $table->timestamps();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });

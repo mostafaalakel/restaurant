@@ -147,7 +147,7 @@ Route::get('payment-cancel/{order}', [OrderController::class, 'paymentCancel'])-
 // Routes for reservation
 Route::group(['prefix' => 'reservation', 'middleware' => 'auth:user'], function () {
     Route::post('create', [ReservationController::class, 'createReservation']);
-    Route::get('showReservation/{user_id}', [ReservationController::class, 'showReservation']);
+    Route::get('showReservation', [ReservationController::class, 'showReservation']);
     Route::delete('delete/{id}', [ReservationController::class, 'deleteReservation']);
     Route::patch('update/{id}', [ReservationController::class, 'updateReservation']);
 });

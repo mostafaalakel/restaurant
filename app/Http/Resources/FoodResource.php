@@ -19,11 +19,12 @@ class FoodResource extends JsonResource
             'food_name' => $this->getTranslation('name' , app()->getLocale()),
             'image_url' => asset(public_path('upload/food_images/'. $this->image)),
             'description' => $this->getTranslation('description' , app()->getLocale()),
-            'price' => $this->price ."$" ,
+            'price' => $this->price ." $" ,
+            'stock' => $this->stock,
             'average_rating' => $this->average_rating,
         ];
         if($this->generalDiscounts->isNotEmpty()){
-            $data['price_after_discounts'] = $this->price_after_discounts ."$";
+            $data['price_after_discounts'] = $this->price_after_discounts ." $";
             $data['discounts'] = $this->generalDiscounts->map(function($discount){
                 return [
                     'discount_id' => $discount->id,

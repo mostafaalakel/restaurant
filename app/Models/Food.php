@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class Food extends Model
 {
-    use HasFactory , HasTranslations;
+    use HasFactory, HasTranslations;
+
     protected $table = 'foods';
     public $translatable = ['name', 'description'];
 
@@ -20,7 +21,7 @@ class Food extends Model
         'category_id',
         'price',
         'image',
-        'quantity',
+        'stock',
         'description'
     ];
 
@@ -33,6 +34,7 @@ class Food extends Model
     {
         return $this->hasMany(CartItem::class);
     }
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
@@ -42,6 +44,7 @@ class Food extends Model
     {
         return $this->hasMany(Review::class);
     }
+
     public function generalDiscounts()
     {
         return $this->belongsToMany(GeneralDiscount::class, 'food_general_discount');
@@ -78,10 +81,21 @@ class Food extends Model
         ])->orderByDesc('average_rating');
     }
 
-    public function scopeWithGeneralDiscounts(Builder $query)
+    public function scopeWithGeneralDiscounts(Builder $query) //  all food with general discounts
     {
-        $query->with(['generalDiscounts' => function ($query) {
-            $query->where('is_active', 1)->where('start_date', '<=', now())->where('end_date', '>=', now());
-        }]);
+      $query->with(['generalDiscounts' => function ($query) {
+          $query->where('is_active', true)->where('start_date', '<=', now())->where('end_date', '>=', now());
+      }]);
+
+    }
+
+    public function scopeFoodGeneralDiscounts(Builder $query) // get only foods which have general discounts
+    {
+        $query->join('food_general_discount', 'foods.id', '=', 'food_general_discount.food_id')
+            ->join('general_discounts', 'food_general_discount.general_discount_id', '=', 'general_discounts.id')
+            ->where('general_discounts.is_active', true)
+            ->where('general_discounts.start_date', '<=', now())
+            ->where('general_discounts.end_date', '>=', now())
+            ->orderByDesc('general_discounts.value');
     }
 }

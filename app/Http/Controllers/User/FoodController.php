@@ -15,8 +15,8 @@ class FoodController extends Controller
 
     public function foodDetails($id)
     {
-        $food = Food::WithGeneralDiscounts()
-            ->withAverageRating()
+        $food = Food::WithGeneralDiscounts()// this is Local query scope in food model
+            ->withAverageRating()// this is Local query scope in food model
             ->find($id);
 
        $food = $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
@@ -27,9 +27,7 @@ class FoodController extends Controller
 
     public function foodDiscount()
     {
-        $foods = Food::whereHas('generalDiscounts', function ($query) {
-            $query->where('is_active', 1)->where('start_date', '<=', now())->where('end_date', '>=', now());
-        })->WithGeneralDiscounts() // this is Local query scope in food model
+        $foods = Food::FoodGeneralDiscounts() // this is Local query scope in food model
             ->withAverageRating() // this is Local query scope in food model
             ->get();
 
@@ -53,9 +51,7 @@ class FoodController extends Controller
             $query->whereBetween('price', [$request->get('min_price'), $request->get('max_price')]);
         }
 
-        $foods = $query
-            ->withAverageRating()
-            ->get();
+        $foods = $query->withAverageRating()->get();
 
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
@@ -67,7 +63,7 @@ class FoodController extends Controller
     {
         if ($food->generalDiscounts->isNotEmpty()) {
             $price_after_discounts = $food->calculate_price_after_discounts; // this is accessor to calculate_price_after_discounts in product model
-            $food->setAttribute('price_after_discounts', $price_after_discounts);
+            $food->setAttribute('price_after_discounts', number_format($price_after_discounts, 2));
         }
         return $food;
     }

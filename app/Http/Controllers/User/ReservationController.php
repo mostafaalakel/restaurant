@@ -50,15 +50,15 @@ class ReservationController extends Controller
     }
   }
 
-  public function showReservation($user_id)
+  public function showReservation()
   {
-    $userReservation = User::find($user_id)->reservations()->orderByDesc('id')->get();
+    $userReservation = Auth::guard('user')->user()->reservations()->get();
 
     if (!$userReservation->isEmpty()) {
       $userReservationResource = ReservationResource::collection($userReservation);
       return $this->retrievedResponse($userReservationResource, 'Reservation retrieved successfully');
     } else {
-      return $this->apiResponse(404, 'No reservations found for this user');
+      return $this->apiResponse(404, 'No reservations found');
     }
   }
 

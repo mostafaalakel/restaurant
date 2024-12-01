@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\User\FoodController;
 use App\Http\Resources\FoodResource;
+use App\Http\Resources\FoodSummaryResource;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\category;
 use App\Models\Food;
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
+class HomeController extends FoodController
 {
     use ApiResponseTrait;
+
     public function index()
     {
+        // sorting data depends on rating and discounts value (FoodGeneralDiscounts and withAverageRating are query scope in food model)
+        $foods = Food::FoodGeneralDiscounts()->withAverageRating()->get();
 
-        $categories = Category::with(['foods' => function ($query) {
-            $query->orderBy('id', 'desc')->take(4);
-        }])->get();
+        $foods->transform(function ($food) {
+            return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
+        });
 
-        $HomeFoods = [];
+        return $this->retrievedResponse(FoodSummaryResource::collection($foods), 'Food discount retrieved successfully');
 
-        foreach ($categories as $category) {
-            $HomeFoods[$category->name] = FoodResource::collection($category->foods);
-        }
 
-        return $this->retrievedResponse($HomeFoods , 'Most popular foods were retrieved successfully.');
     }
 }
