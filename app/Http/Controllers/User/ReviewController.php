@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Validator;
 class ReviewController extends Controller
 {
     use ApiResponseTrait;
+
     public function addReviews(Request $request)
     {
         $existingReview = Review::where('food_id', $request->food_id)
-            ->where('user_id', Auth::id())
+            ->where('user_id', Auth::guard('user')->id())
             ->first();
 
         if ($existingReview) {
@@ -25,8 +26,7 @@ class ReviewController extends Controller
 
         $rules = [
             'food_id' => 'required|exists:foods,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
+            'rating' => 'required|integer|min:1|max:5'
         ];
 
         $validate = Validator::make($request->all(), $rules);
@@ -34,14 +34,13 @@ class ReviewController extends Controller
             return $this->validationErrorResponse($validate->errors());
         }
 
-        $review = Review::create([
-            'user_id' => Auth::id(),
+        Review::create([
+            'user_id' => Auth::guard('user')->id(),
             'food_id' => $request->food_id,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'rating' => $request->rating
         ]);
 
-        return $this->createdResponse([], 'Review added successfully');
+        return $this->createdResponse(null, 'Review added successfully');
     }
 
     public function showReviews($food_id)
@@ -52,7 +51,7 @@ class ReviewController extends Controller
             $reviewsResource = ReviewResource::collection($reviews);
             return $this->retrievedResponse($reviewsResource, 'Reviews retrieved successfully');
         } else {
-            return $this->apiResponse(200, 'No reviews found yet', []);
+            return $this->apiResponse('success', 'No reviews found yet', []);
         }
     }
 }
