@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Food\CategoryController;
-use App\Http\Controllers\Food\FoodController;
+use App\Mail\Email;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,5 +18,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/c' , [CategoryController::class , 'index']);

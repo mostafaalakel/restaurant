@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Traits\baseTrait;
+namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use App\Models\category;
+use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
+use App\Models\category;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 
-trait CategoryTrait
+class CategoryController extends Controller
 {
     use ApiResponseTrait;
-
     public function addCategory(Request $request)
     {
         $rules = [
@@ -97,4 +97,5 @@ trait CategoryTrait
 
         return $this->retrievedResponse($categories, 'Categories retrieved successfully');
     }
+
 }

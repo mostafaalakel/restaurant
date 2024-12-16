@@ -23,6 +23,8 @@ class GeneralDiscount extends Model
         'is_active',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function foods()
     {
         return $this->belongsToMany(Food::class, 'food_general_discount');

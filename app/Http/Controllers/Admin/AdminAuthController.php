@@ -39,14 +39,14 @@ class AdminAuthController extends Controller
 
         $data = [
             'admin' => $admin,
-            'authorization' =>  [
+            'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
                 'expires_in' => JWTAuth::factory()->getTTL() * 60
             ]
         ];
 
-        return $this->apiResponse(200, 'You are logged in successfully', $data);
+        return $this->apiResponse('success', 'You are logged in successfully', $data);
     }
 
 
@@ -76,21 +76,21 @@ class AdminAuthController extends Controller
 
         $data = [
             'admin' => $adminResource,
-            'authorization' =>  [
+            'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
                 'expires_in' => JWTAuth::factory()->getTTL() * 60
             ]
         ];
 
-        return $this->apiResponse(201, 'You are registered successfully', $data);
+        return $this->createdResponse($data, 'You are registered successfully');
     }
 
     public function logout()
     {
         try {
             Auth::guard('admin')->logout();
-            return $this->apiResponse(200, 'Admin logged out successfully');
+            return $this->apiResponse('success', 'Admin logged out successfully');
         } catch (\Exception $e) {
             return $this->apiResponse(500, 'Something went wrong');
         }
@@ -102,5 +102,5 @@ class AdminAuthController extends Controller
             'token' => Auth::guard('admin')->refresh()
         ]);
     }
-    
+
 }

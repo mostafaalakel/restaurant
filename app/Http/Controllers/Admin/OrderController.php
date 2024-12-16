@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Traits\baseTrait;
+namespace App\Http\Controllers\Admin;
 
-use App\Models\Order;
-use Illuminate\Http\Request;
-use App\Models\OrderItem;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Traits\ApiResponseTrait;
-use App\Http\Resources\OrderItemResource;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-trait OrderTrait
+class OrderController extends Controller
 {
     use ApiResponseTrait;
 

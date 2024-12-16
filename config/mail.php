@@ -34,6 +34,12 @@ return [
     */
 
     'mailers' => [
+        'mailgun' => [
+            'transport' => 'mailgun',
+            'domain' => env('MAILGUN_DOMAIN'),
+            'secret' => env('MAILGUN_SECRET'),
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
@@ -47,13 +53,6 @@ return [
 
         'ses' => [
             'transport' => 'ses',
-        ],
-
-        'mailgun' => [
-            'transport' => 'mailgun',
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
         ],
 
         'postmark' => [

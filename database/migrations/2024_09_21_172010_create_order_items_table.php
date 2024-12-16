@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('food_id');
             $table->integer('quantity');
             $table->decimal('price');
-            $table->decimal('price_after_discount');
+            $table->decimal('price_after_discounts');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('food_id')->references('id')->on('foods')->onDelete('cascade');
             $table->timestamps();

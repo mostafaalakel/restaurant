@@ -36,7 +36,7 @@ class CartController extends Controller
             return [
                 'cart_item_id' => $cartItem->id,
                 'food_id' => $cartItem->food->id,
-                'food_name' => $cartItem->food->name,
+                'food_name' => $cartItem->food->getTranslation('name' , app()->getLocale()),
                 'food_price' => number_format($cartItem->food->price, 2) . " $",
                 'food_image' => asset('upload/food_images/' . $cartItem->food->image),
                 'quantity' => $cartItem->quantity,

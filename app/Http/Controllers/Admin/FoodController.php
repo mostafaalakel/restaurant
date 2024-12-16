@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Traits\baseTrait;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
-use App\Models\Food;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\FoodResource;
+use App\Http\Traits\ApiResponseTrait;
+use App\Models\Food;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-trait FoodTrait
+class FoodController extends Controller
 {
     use ApiResponseTrait;
 
@@ -114,7 +115,7 @@ trait FoodTrait
             'category_id' => $request->category_id,
             'name' => $request->name,
             'price' => $request->price,
-            'description' => $request->description ,
+            'description' => $request->description,
             'stock' => $request->stock
         ]);
         return $this->updatedResponse(null, 'food updated successfully');
@@ -122,10 +123,23 @@ trait FoodTrait
 
     public function showFoods()
     {
-        $foods = Food::withAverageRating()->paginate(10);
+        $foods = Food::withAverageRating()->WithGeneralDiscounts()->paginate(10);
+
         if (!$foods->isEmpty()) {
+            $foods->transform(function ($food) {
+                return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
+            });
             return FoodResource::collection($foods);
         }
         return $this->notFoundResponse('No foods available');
+    }
+
+    public function checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food)
+    {
+        if ($food->generalDiscounts->isNotEmpty()) {
+            $price_after_discounts = $food->calculate_price_after_discounts; // this is accessor to calculate_price_after_discounts in product model
+            $food->setAttribute('price_after_discounts', number_format($price_after_discounts, 2));
+        }
+        return $food;
     }
 }

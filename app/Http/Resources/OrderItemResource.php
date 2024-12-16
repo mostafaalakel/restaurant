@@ -18,12 +18,12 @@ class OrderItemResource extends JsonResource
 
             'order_item_id'=> $this->id ,
             'quantity'=> $this->quantity ,
-            'price' => $this->price ." $",
-            'price_after_discounts' => $this->price_after_discounts ." $",
             'food' => [
                 'name' => $this->food->name,
                 'image_url' => asset(public_path('upload/food_images/'. $this->food->image)),
             ],
+            'price' => $this->price ." $",
+            'price_after_discounts' => $this->price_after_discounts ." $",
         ];
     }
 }

@@ -222,7 +222,7 @@ class OrderController extends Controller
 
     public function myOrders()
     {
-        $orders = Auth::user()->orders;
+        $orders = Auth::user()->orders()->with('user:id,name')->get();
 
         if ($orders->isEmpty()) {
             return $this->retrievedResponse([], 'You have no orders yet');

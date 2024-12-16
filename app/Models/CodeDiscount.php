@@ -18,6 +18,8 @@ class CodeDiscount extends Model
         'is_active'
     ];
 
+    protected $hidden=['created_at','updated_at'];
+
     public function cartItems()
     {
         return $this->belongsToMany(CartItem::class, 'cart_item_discount_code');

@@ -14,16 +14,16 @@ use App\Models\Order;
 use App\Models\Reservation;
 use App\Models\category;
 
-class AdminController extends Controller
+class DashboardController extends Controller
 {
-    use OrderTrait, FoodTrait, CategoryTrait, ReservationTrait, ApiResponseTrait;
+
     public function index()
     {
         $homeDashboard = [
-            'numbers of categories' =>  $categories_count = category::count(),
-            'numbers of foods' => $foods_count = Food::count(),
-            'numbers of orders' =>  $orders_count = Order::where('order_status', 'processing')->count(),
-            'numbers of reservations' =>   $reservations_count = Reservation::where('status', 'processing')->count()
+            'numbers of categories' => category::count(),
+            'numbers of foods' => Food::count(),
+            'numbers of orders' => Order::where('order_status', 'processing')->count(),
+            'numbers of reservations' => Reservation::where('status', 'processing')->count()
         ];
         return $this->retrievedResponse($homeDashboard, 'Home Dashboard retrieved successfully');
     }

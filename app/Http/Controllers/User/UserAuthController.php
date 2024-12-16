@@ -48,7 +48,7 @@ class UserAuthController extends Controller
             ]
         ];
 
-        return $this->apiResponse(200, 'You are logged in successfully', $data);
+        return $this->apiResponse('success', 'You are logged in successfully', $data);
     }
 
     public function register(Request $request)
@@ -85,14 +85,14 @@ class UserAuthController extends Controller
             ]
         ];
 
-        return $this->apiResponse(201, 'You are registered successfully', $data);
+        return $this->createdResponse($data, 'You are registered successfully');
     }
 
     public function logout()
     {
         try {
             Auth::guard('user')->logout();
-            return $this->apiResponse(200, 'User logged out successfully');
+            return $this->apiResponse('success', 'User logged out successfully');
         } catch (Exception $e) {
             return $this->apiResponse(500, 'Something went wrong', []);
         }
