@@ -123,7 +123,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
             Route::get('/show', [\App\Http\Controllers\Admin\CategoryController::class, 'showCategories']);
             Route::post('/add', [\App\Http\Controllers\Admin\CategoryController::class, 'addCategory']);
             Route::patch('/update/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'updateCategory']);
-            Route::delete('/deleteCategory/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'deleteCategory']);
+            Route::delete('/delete/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'deleteCategory']);
         });
 
         // Foods
@@ -131,7 +131,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
             Route::get('/show', [\App\Http\Controllers\Admin\FoodController::class, 'showFoods']);
             Route::post('/add', [\App\Http\Controllers\Admin\FoodController::class, 'addFood']);
             Route::patch('/update/{food_id}', [\App\Http\Controllers\Admin\FoodController::class, 'updateFood']);
-            Route::delete('/deleteFood/{food_id}', [\App\Http\Controllers\Admin\FoodController::class, 'deleteFood']);
+            Route::delete('/delete/{food_id}', [\App\Http\Controllers\Admin\FoodController::class, 'deleteFood']);
         });
     });
 

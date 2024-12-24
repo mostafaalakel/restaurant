@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\GeneralDiscount;
 use App\Models\CodeDiscount;
-use App\Models\Food;
 
 class DiscountController extends Controller
 {
@@ -17,19 +16,14 @@ class DiscountController extends Controller
 
     public function getAllGeneralDiscounts()
     {
-        $generalDiscounts = GeneralDiscount::paginate(10);
-        return DiscountResource::collection($generalDiscounts);
+        $generalDiscounts = GeneralDiscount::all();
+        return $this->retrievedResponse(DiscountResource::collection($generalDiscounts));
     }
 
     public function getAllCodeDiscounts()
     {
-        $codeDiscounts = CodeDiscount::paginate(10);
-        $codeDiscounts->getCollection()->transform(function ($codeDiscount) {
-            $codeDiscount->value = $codeDiscount->value . " %";
-            return $codeDiscount;
-        });
-
-        return $this->retrievedResponse($codeDiscounts);
+        $codeDiscounts = CodeDiscount::all();
+        return $this->retrievedResponse(DiscountResource::collection($codeDiscounts));
     }
 
 
