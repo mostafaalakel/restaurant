@@ -43,15 +43,5 @@ class ReviewController extends Controller
         return $this->createdResponse(null, 'Review added successfully');
     }
 
-    public function showReviews($food_id)
-    {
-        $reviews = Review::where('food_id', $food_id)->with('user')->get();
 
-        if (!$reviews->isEmpty()) {
-            $reviewsResource = ReviewResource::collection($reviews);
-            return $this->retrievedResponse($reviewsResource, 'Reviews retrieved successfully');
-        } else {
-            return $this->apiResponse('success', 'No reviews found yet', []);
-        }
-    }
 }

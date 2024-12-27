@@ -45,11 +45,11 @@ Route::group(['middleware' => 'setLocale'], function () {
 
 // Routes for review
 Route::post('/review/addReviews', [ReviewController::class, 'AddReviews']);
-Route::get('/review/show/{food_item_id}', [ReviewController::class, 'showReviews']);
 
 
 // Routes with 'auth:user' middleware
 Route::group(['middleware' => 'auth:user'], function () {
+    Route::post('/review/addReviews', [ReviewController::class, 'AddReviews']); // Routes for review
 
     // Routes for cart
     Route::group(['prefix' => 'cart'], function () {

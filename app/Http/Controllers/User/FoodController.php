@@ -16,10 +16,10 @@ class FoodController extends Controller
     public function foodDetails($id)
     {
         $food = Food::WithGeneralDiscounts()// this is Local query scope in food model
-            ->withAverageRating()// this is Local query scope in food model
-            ->find($id);
+        ->withAverageRating()// this is Local query scope in food model
+        ->find($id);
 
-       $food = $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
+        $food = $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
 
         $foodResource = new FoodResource($food);
         return $this->retrievedResponse($foodResource, 'Food details retrieved successfully');
@@ -28,15 +28,14 @@ class FoodController extends Controller
     public function foodDiscount()
     {
         $foods = Food::FoodGeneralDiscounts() // this is Local query scope in food model
-            ->withAverageRating() // this is Local query scope in food model
-            ->get();
+        ->withAverageRating() // this is Local query scope in food model
+        ->paginate(10);
 
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
         });
 
-        return $this->retrievedResponse(FoodSummaryResource::collection($foods), 'Food discount retrieved successfully');
-
+        return FoodSummaryResource::collection($foods);
     }
 
     public function foodFilter(Request $request)
@@ -51,12 +50,13 @@ class FoodController extends Controller
             $query->whereBetween('price', [$request->get('min_price'), $request->get('max_price')]);
         }
 
-        $foods = $query->withAverageRating()->get();
+        $foods = $query->withAverageRating()->paginate(10);
 
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
         });
-        return $this->retrievedResponse(FoodSummaryResource::collection($foods), 'Food retrieved successfully');
+
+        return FoodSummaryResource::collection($foods);
     }
 
     public function checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food)

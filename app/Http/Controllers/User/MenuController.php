@@ -32,13 +32,12 @@ class MenuController extends FoodController
         $foods = Food::where('category_id', $category_id)
             ->WithGeneralDiscounts() // this is Local query scope in food model
             ->withAverageRating() // this is Local query scope in food model
-            ->get();
+            ->paginate(10);
 
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
         });
 
-        $foodResources = FoodSummaryResource::collection($foods);
-        return $this->retrievedResponse($foodResources, 'foods retrieved successfully');
+        return FoodSummaryResource::collection($foods);
     }
 }
