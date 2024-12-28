@@ -1,4 +1,4 @@
-# Restaurant Management System
+# Restaurant Management Api
 
 ## Description:
 This project is a comprehensive Restaurant Management System developed using Laravel, designed to streamline various operations of a restaurant. The system provides a seamless experience for both customers and restaurant staff, allowing users to browse food items, add them to a cart, make secure payments via PayPal, and even reserve tables. The system also supports user-generated reviews to improve services, while the administrative roles ensure efficient restaurant management through an easy-to-use dashboard. The API supports multiple user roles, enabling different levels of access to restaurant data and operations.
