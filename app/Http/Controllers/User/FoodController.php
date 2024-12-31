@@ -13,16 +13,14 @@ class FoodController extends Controller
 {
     use ApiResponseTrait;
 
-    public function foodDetails($id)
+    public function foodDetails($foodId)
     {
         $food = Food::WithGeneralDiscounts()// this is Local query scope in food model
         ->withAverageRating()// this is Local query scope in food model
-        ->find($id);
+        ->find($foodId);
 
         $food = $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
-
-        $foodResource = new FoodResource($food);
-        return $this->retrievedResponse($foodResource, 'Food details retrieved successfully');
+        return $this->retrievedResponse(new FoodResource($food), 'Food details retrieved successfully');
     }
 
     public function foodDiscount()
@@ -40,7 +38,7 @@ class FoodController extends Controller
 
     public function foodFilter(Request $request)
     {
-        $query = Food::query()->WithGeneralDiscounts(); // this is Local query scope in food model
+        $query = Food::query();
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->get('category_id'));
@@ -50,7 +48,7 @@ class FoodController extends Controller
             $query->whereBetween('price', [$request->get('min_price'), $request->get('max_price')]);
         }
 
-        $foods = $query->withAverageRating()->paginate(10);
+        $foods = $query->WithGeneralDiscounts()->withAverageRating()->paginate(10);
 
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);

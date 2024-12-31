@@ -65,7 +65,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            $order = $this->createNewOrder($request);
+            $order = $this->createNewOrder($request , $cartItems);
             $this->createOrderItems($order, $cart->id);
             CartItem::where('cart_id', $cart->id)->delete();
 
@@ -96,12 +96,8 @@ class OrderController extends Controller
         }
     }
 
-    public function createNewOrder(Request $request)
+    public function createNewOrder(Request $request, $cartItems)
     {
-        $cart = Cart::where('user_id', Auth::guard('user')->id())->first();
-        $cartItems = $cart->cartItems()->get();
-
-
         $price = $cartItems->sum(function ($cartItem) {
             return $cartItem->quantity * $cartItem->food->price;
         });
@@ -232,9 +228,9 @@ class OrderController extends Controller
         return $this->retrievedResponse($ordersResource, 'Your orders retrieved successfully');
     }
 
-    public function myOrderDetails($id)
+    public function myOrderDetails($orderId)
     {
-        $orderItems = OrderItem::where('order_id', $id)->with('food')->get();
+        $orderItems = OrderItem::where('order_id', $orderId)->with('food')->get();
 
         if ($orderItems->isEmpty()) {
             return $this->retrievedResponse([], 'Your order has no items');

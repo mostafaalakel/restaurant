@@ -17,7 +17,7 @@ class ReservationController extends Controller
   public function createReservation(Request $request)
   {
 
-    $existingReservation = Reservation::where('user_id', Auth::id())
+    $existingReservation = Reservation::where('user_id', Auth::guard('user')->id())
       ->where('status', 'processing')
       ->first();
 
@@ -37,7 +37,7 @@ class ReservationController extends Controller
     }
 
     $reservation = Reservation::create([
-      'user_id' => Auth::id(),
+      'user_id' => Auth::guard('user')->id(),
       'num_people' => $request->num_people,
       'reservation_time' => $request->reservation_time,
       'special_request' => $request->special_request
@@ -62,15 +62,15 @@ class ReservationController extends Controller
     }
   }
 
-  public function deleteReservation($id)
+  public function deleteReservation($reservationId)
   {
-    $reservation = Reservation::findOrFail($id);
+    $reservation = Reservation::findOrFail($reservationId);
     $reservation->delete();
 
     return $this->apiResponse(200, 'Reservation deleted successfully');
   }
 
-  public function updateReservation(Request $request, $id)
+  public function updateReservation(Request $request, $reservationId)
   {
     $rules = [
       'num_people' => 'required|integer|min:1',
@@ -83,7 +83,7 @@ class ReservationController extends Controller
       return $this->validationErrorResponse($validate->errors());
     }
 
-    $reservation = Reservation::findOrFail($id);
+    $reservation = Reservation::findOrFail($reservationId);
     $reservation->update([
       'num_people' => $request->num_people,
       'reservation_time' => $request->reservation_time,

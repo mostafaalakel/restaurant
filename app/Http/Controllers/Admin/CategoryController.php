@@ -45,9 +45,9 @@ class CategoryController extends Controller
         }
     }
 
-    public function updateCategory(Request $request, $id)
+    public function updateCategory(Request $request, $categoryId)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::findOrFail($categoryId);
         $rules = [
             'name.en' => 'required',
             'name.ar' => 'required',
@@ -74,9 +74,9 @@ class CategoryController extends Controller
         return $this->updatedResponse(null, 'Category updated successfully');
     }
 
-    public function deleteCategory($id)
+    public function deleteCategory($categoryId)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::findOrFail($categoryId);
         $category->delete();
 
         return $this->deletedResponse('Category deleted successfully');

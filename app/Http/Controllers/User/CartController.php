@@ -18,7 +18,7 @@ class CartController extends Controller
 {
     use ApiResponseTrait;
 
-    public function showCartInfo(Request $request)
+    public function showCartInfo()
     {
         $userId = Auth::guard('user')->id();
         $cart = Cart::with(['cartItems.food', 'cartItems.generalDiscounts', 'cartItems.codeDiscounts'])
