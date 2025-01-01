@@ -45,17 +45,12 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
-        
+
         'admin' => [
             'driver' => 'jwt',
             'provider' => 'admins',
         ],
 
-
-        'superAdmin' => [
-            'driver' => 'jwt',
-            'provider' => 'superAdmins',
-        ],
     ],
 
     /*
