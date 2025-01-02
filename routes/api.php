@@ -12,7 +12,7 @@ use App\Http\Controllers\User\ReviewController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\User\ReservationController;
-use App\Http\Controllers\User\MenuController;
+use App\Http\Controllers\User\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,17 +30,15 @@ Route::group(['middleware' => 'setLocale'], function () {
     Route::get('/home', [HomeController::class, 'index']);
 
     //route for foods
-    Route::group(['prefix' => 'food'], function () {
+    Route::group(['prefix' => 'foods'], function () {
         Route::get('/discounts', [FoodController::class, 'foodDiscount']);
         Route::get('/filter', [FoodController::class, 'foodFilter']);
         Route::get('/details/{food_id}', [FoodController::class, 'FoodDetails']);
+        Route::get('/{category_id}', [CategoryController::class, 'showFoodOfCategory']);
     });
 
-    //route for menu
-    Route::group(['prefix' => 'menu'], function () {
-        Route::get('/category', [MenuController::class, 'showCategories']);
-        Route::get('/foods/{category_id}', [MenuController::class, 'showFoodOfCategory']);
-    });
+    //route for category
+        Route::get('/categories', [CategoryController::class, 'showCategories']);
 });
 
 // Routes for review

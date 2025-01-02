@@ -29,6 +29,7 @@ class FoodController extends Controller
         ->withAverageRating() // this is Local query scope in food model
         ->paginate(10);
 
+
         $foods->transform(function ($food) {
             return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
         });
@@ -66,4 +67,17 @@ class FoodController extends Controller
         return $food;
     }
 
+    public function showFoodOfCategory($category_id)
+    {
+        $foods = Food::where('category_id', $category_id)
+            ->WithGeneralDiscounts() // this is Local query scope in food model
+            ->withAverageRating() // this is Local query scope in food model
+            ->paginate(10);
+
+        $foods->transform(function ($food) {
+            return $this->checkIfFoodHasDiscountAndGetPriceAfterDiscounts($food);
+        });
+
+        return FoodSummaryResource::collection($foods);
+    }
 }

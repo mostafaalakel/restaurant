@@ -69,10 +69,11 @@ class CartController extends Controller
         });
 
         $totalPrice = $cartItems->sum(function ($item) {
-            $price = floatval($item['price_after_discount']);
+            $price = floatval(preg_replace('/[^0-9.]/', '', $item['price_after_discount']));
             $quantity = intval($item['quantity']);
             return $price * $quantity;
         });
+
 
 
         return response()->json([
