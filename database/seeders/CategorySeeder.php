@@ -14,17 +14,17 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::create([
-            'name' => json_encode([
+            'name' => [
                 'en' => 'Appetizers',
                 'ar' => 'المقبلات',
-            ],JSON_UNESCAPED_UNICODE),
+            ],
         ]);
 
         Category::create([
-            'name' => json_encode([
+            'name' => [
                 'en' => 'Main Dishes',
                 'ar' => 'الأطباق الرئيسية',
-            ],JSON_UNESCAPED_UNICODE),
+            ],
         ]);
     }
 }

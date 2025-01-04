@@ -14,33 +14,33 @@ class FoodSeeder extends Seeder
     public function run()
     {
         Food::create([
-            'name' => json_encode([
+            'name' => [
                 'en' => 'Cheese Pizza',
                 'ar' => 'بيتزا بالجبن',
-            ]),
+            ],
             'category_id' => 1,
             'price' => 9.99,
             'image' => 'cheese_pizza.jpg',
-            'description' => json_encode([
+            'description' => [
                 'en' => 'Delicious cheese pizza with fresh ingredients',
                 'ar' => 'بيتزا لذيذة بالجبن مع مكونات طازجة',
-            ]),
-            'quantity' => 50,
-        ],JSON_UNESCAPED_UNICODE);
+            ],
+            'stock' => 50,
+        ]);
 
         Food::create([
-            'name' => json_encode([
+            'name' =>[
                 'en' => 'Grilled Chicken',
                 'ar' => 'دجاج مشوي',
-            ]),
+            ],
             'category_id' => 2,
             'price' => 15.50,
             'image' => 'grilled_chicken.jpg',
-            'description' => json_encode([
+            'description' => [
                 'en' => 'Juicy grilled chicken with spices',
                 'ar' => 'دجاج مشوي طري مع التوابل',
-            ]),
-            'quantity' => 30,
-        ],JSON_UNESCAPED_UNICODE);
+            ],
+            'stock' => 30,
+        ]);
     }
 }

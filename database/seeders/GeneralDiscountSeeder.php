@@ -14,13 +14,13 @@ class GeneralDiscountSeeder extends Seeder
     public function run()
     {
         GeneralDiscount::create([
-            'name' => json_encode([
+            'name' => [
                 'en' => 'Holiday Sale',
                 'ar' => 'تخفيضات العطلات',
-            ],JSON_UNESCAPED_UNICODE),
+            ],
             'value' => 10.00,
             'start_date' => now(),
             'end_date' => now()->addDays(10),
-        ],JSON_UNESCAPED_UNICODE);
+        ]);
     }
 }

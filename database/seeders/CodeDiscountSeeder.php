@@ -17,7 +17,6 @@ class CodeDiscountSeeder extends Seeder
             'name' => 'Welcome Discount',
             'code' => 'WELCOME10',
             'value' => 15.00,
-            'max_uses' => 100,
             'start_date' => now(),
             'end_date' => now()->addDays(7),
         ]);
