@@ -16,7 +16,7 @@ class ReservationController extends Controller
     {
         $Reservations = ReservationResource::collection(Reservation::orderBy('id', 'desc')->get());
         if ($Reservations->isEmpty()) {
-            return $this->notFoundResponse( 'You have no Reservations yet');
+            return $this->retrievedResponse(null ,'You have no Reservations yet');
         }
         return $this->retrievedResponse($Reservations,  'the Reservation are retrieved successfully' );
     }

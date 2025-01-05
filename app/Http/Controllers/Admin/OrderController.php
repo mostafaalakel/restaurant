@@ -33,7 +33,7 @@ class OrderController extends Controller
     {
         $orderItems = OrderItem::where('order_id', $order_id)->with('food')->get();
         if ($orderItems->isEmpty()) {
-            return $this->notFoundResponse('Order has no items');
+            return $this->retrievedResponse(null,'Order has no items');
         }
 
         $orderItems = OrderItemResource::collection($orderItems);
