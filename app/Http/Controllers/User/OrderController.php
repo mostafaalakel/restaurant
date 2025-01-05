@@ -27,7 +27,7 @@ class OrderController extends Controller
         $cartItems = $cart->cartItems()->get();
 
         if ($cartItems->count() === 0) {
-            return $this->notFoundResponse("Your cart is empty");
+            return $this->retrievedResponse(null,"Your cart is empty");
         }
 
         $insufficientStockItems = [];
