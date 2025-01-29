@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\category;
 use App\Services\User\CartService;
 use App\Services\User\CategoryService;
 
-class CategoryController extends FoodController
+class CategoryController extends Controller
 {
     use ApiResponseTrait;
 

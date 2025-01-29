@@ -34,7 +34,7 @@ Route::group(['middleware' => 'setLocale'], function () {
         Route::get('/discounts', [FoodController::class, 'foodDiscount']);
         Route::get('/filter', [FoodController::class, 'foodFilter']);
         Route::get('/details/{food_id}', [FoodController::class, 'FoodDetails']);
-        Route::get('/{category_id}', [CategoryController::class, 'showFoodOfCategory']);
+        Route::get('/{category_id}', [FoodController::class, 'showFoodOfCategory']);
     });
 
     //route for category
