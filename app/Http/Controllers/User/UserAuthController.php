@@ -11,16 +11,16 @@ class UserAuthController extends Controller
 {
     use ApiResponseTrait;
 
-    protected $authService;
+    protected $userAuthService;
 
-    public function __construct(UserAuthService $authService)
+    public function __construct(UserAuthService $userAuthService)
     {
-        $this->authService = $authService;
+        $this->userAuthService = $userAuthService;
     }
 
     public function login(Request $request)
     {
-        $result = $this->authService->login($request);
+        $result = $this->userAuthService->login($request);
 
         if ($result['status'] == 'error') {
             return isset($result['errors'])
@@ -33,7 +33,7 @@ class UserAuthController extends Controller
 
     public function register(Request $request)
     {
-        $result = $this->authService->register($request);
+        $result = $this->userAuthService->register($request);
 
         if ($result['status'] == 'error') {
             return $this->validationErrorResponse($result['errors']);
@@ -44,13 +44,13 @@ class UserAuthController extends Controller
 
     public function logout()
     {
-        $result = $this->authService->logout();
+        $result = $this->userAuthService->logout();
         return $this->apiResponse('success', $result['message']);
     }
 
     public function refresh()
     {
-        $result = $this->authService->refresh();
+        $result = $this->userAuthService->refresh();
 
         if ($result['status'] == 'error') {
             return $this->unauthorizedResponse($result['message']);
@@ -61,13 +61,13 @@ class UserAuthController extends Controller
 
     public function redirectToGoogle()
     {
-        $loginUrl = $this->authService->googleRedirect();
+        $loginUrl = $this->userAuthService->googleRedirect();
         return $this->retrievedResponse(['login_url' => $loginUrl], 'login_url of google returned successfully');
     }
 
     public function handleGoogleCallback()
     {
-        $result = $this->authService->handleGoogleCallback();
+        $result = $this->userAuthService->handleGoogleCallback();
 
         if ($result['status'] == 'error') {
             return $this->unauthorizedResponse($result['message']);
