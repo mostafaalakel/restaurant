@@ -2,105 +2,61 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Admin;
+use App\Services\Admin\AdminAuthService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Validator;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AdminAuthController extends Controller
 {
     use ApiResponseTrait;
 
-    public function login(Request $request)
+    protected $adminAuthService;
+
+    public function __construct(AdminAuthService $adminAuthService)
     {
-        $rules = [
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors());
-        }
-
-        $credentials = $request->only('email', 'password');
-
-        if (!$token = Auth::guard('admin')->attempt($credentials)) {
-            return $this->apiResponse(401, 'Unauthorized');
-        }
-
-        $admin = new UserResource(Auth::guard('admin')->user());
-
-        $data = [
-            'admin' => $admin,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
-            ]
-        ];
-
-        return $this->apiResponse('success', 'You are logged in successfully', $data);
+        $this->adminAuthService = $adminAuthService;
     }
 
+    public function login(Request $request)
+    {
+        $result = $this->adminAuthService->login($request);
+
+        if ($result['status'] == 'error') {
+            return isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->unauthorizedResponse($result['message']);
+        }
+
+        return $this->apiResponse('success', 'You are logged in successfully', $result['data']);
+    }
 
     public function register(Request $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:admins',
-            'password' => 'required|string|min:6',
-        ];
+        $result = $this->adminAuthService->register($request);
 
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors());
+        if ($result['status'] == 'error') {
+            return $this->validationErrorResponse($result['errors']);
         }
 
-        $admin = Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $token = Auth::guard('admin')->login($admin);
-
-        $adminResource = new UserResource(Auth::guard('admin')->user());
-
-        $data = [
-            'admin' => $adminResource,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
-            ]
-        ];
-
-        return $this->createdResponse($data, 'You are registered successfully');
+        return $this->createdResponse($result['data'], 'You are registered successfully');
     }
 
     public function logout()
     {
-        try {
-            Auth::guard('admin')->logout();
-            return $this->apiResponse('success', 'Admin logged out successfully');
-        } catch (\Exception $e) {
-            return $this->apiResponse(500, 'Something went wrong');
-        }
+        $result = $this->adminAuthService->logout();
+        return $this->apiResponse('success', $result['message']);
     }
 
     public function refresh()
     {
-        return response()->json([
-            'token' => Auth::guard('admin')->refresh()
-        ]);
+        $result = $this->adminAuthService->refresh();
+
+        if ($result['status'] == 'error') {
+            return $this->unauthorizedResponse($result['message']);
+        }
+
+        return $this->apiResponse('success', 'Token refreshed successfully', $result['data']);
     }
 
 }
