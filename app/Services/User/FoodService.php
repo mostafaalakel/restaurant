@@ -58,7 +58,7 @@ class FoodService
         });
     }
 
-    private function applyDiscountIfAvailable($food)
+    public function applyDiscountIfAvailable($food)
     {
         if ($food->generalDiscounts->isNotEmpty()) {
             $price_after_discounts = $food->calculate_price_after_discounts;  // this is accessor to calculate_price_after_discounts in product model
