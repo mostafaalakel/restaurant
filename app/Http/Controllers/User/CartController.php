@@ -68,6 +68,12 @@ class CartController extends Controller
     {
         $result = $this->cartService->deleteItem($cartItemId);
 
+        if (isset($result['status'])) {
+            if ($result['status'] == 'error') {
+                return $this->notFoundResponse($result['message']);
+            }
+        }
+
         return $this->deletedResponse($result);
     }
 
@@ -83,6 +89,11 @@ class CartController extends Controller
         }
 
         $result = $this->cartService->updateItemQuantity($cartItemId, $request->quantity);
+        if (isset($result['status'])) {
+            if ($result['status'] == 'error') {
+                return $this->notFoundResponse($result['message']);
+            }
+        }
 
         return $this->updatedResponse(null, $result);
     }

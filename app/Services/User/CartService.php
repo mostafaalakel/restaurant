@@ -175,7 +175,10 @@ class CartService
 
     public function deleteItem($cartItemId)
     {
-        $item = CartItem::findOrFail($cartItemId);
+        $item = CartItem::find($cartItemId);
+        if (!$item) {
+            return ['status' => 'error', "message" => "Item not found"];
+        }
         $item->delete();
 
         return "Item deleted from cart successfully";
@@ -183,7 +186,10 @@ class CartService
 
     public function updateItemQuantity($cartItemId, $quantity)
     {
-        $item = CartItem::findOrFail($cartItemId);
+        $item = CartItem::find($cartItemId);
+        if (!$item) {
+            return ['status' => 'error', "message" => "Item not found"];
+        }
         $item->update([
             'quantity' => $quantity
         ]);
