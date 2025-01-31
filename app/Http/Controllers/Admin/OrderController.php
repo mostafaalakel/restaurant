@@ -3,56 +3,47 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\OrderItemResource;
-use App\Http\Resources\OrderResource;
 use App\Http\Traits\ApiResponseTrait;
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Services\Admin\OrderService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
     use ApiResponseTrait;
 
+    protected $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function showOrdersWithFilter(Request $request)
     {
-        $query=Order::query();
-        if($request->has('payment_status')){
-            $query->where('payment_status',$request->get('payment_status'));
-        }
-        if($request->has('order_status')){
-            $query->where('order_status',$request->get('order_status'));
-        }
-
-        $orders = $query->paginate(10);
-        return OrderResource::collection($orders);
+        return $this->retrievedResponse($this->orderService->showOrdersWithFilter($request));
     }
 
-    public function orderDetails($order_id)
+    public function orderDetails($orderId)
     {
-        $orderItems = OrderItem::where('order_id', $order_id)->with('food')->get();
-        if ($orderItems->isEmpty()) {
-            return $this->retrievedResponse(null,'Order has no items');
+        $result = $this->orderService->orderDetails($orderId);
+
+        if ($result['status'] === 'error') {
+            return $this->notFoundResponse($result['message']);
         }
 
-        $orderItems = OrderItemResource::collection($orderItems);
-        return $this->retrievedResponse($orderItems, 'Order items retrieved successfully');
+        return $this->retrievedResponse($result['data'], 'Order items retrieved successfully');
     }
 
-    public function updateOrderStatus(Request $request, $order_id)
+    public function updateOrderStatus(Request $request, $orderId)
     {
-        $rules = ['order_status' => 'required'];
-        $validate = Validator::make($request->all(), $rules);
-        if ($validate->fails()) {
-            return $this->validationErrorResponse($validate->errors());
+        $result = $this->orderService->updateOrderStatus($request, $orderId);
+
+        if ($result['status'] === 'error') {
+            return isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->notFoundResponse($result['message']);
         }
 
-        $order_status = Order::findOrFail($order_id);
-        $order_status->update([
-            'order_status' => $request->order_status
-        ]);
-
-        return $this->updatedResponse(null, 'order status updated successfully');
+        return $this->updatedResponse(null, $result['message']);
     }
 }
