@@ -2,152 +2,77 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\User;
-use App\Events\CartEvent;
-use Exception;
+use App\Services\User\UserAuthService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Validator;
-use Laravel\Socialite\Facades\Socialite;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class UserAuthController extends Controller
 {
     use ApiResponseTrait;
 
+    protected $userAuthService;
+
+    public function __construct(UserAuthService $userAuthService)
+    {
+        $this->userAuthService = $userAuthService;
+    }
+
     public function login(Request $request)
     {
-        $rules = [
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ];
+        $result = $this->userAuthService->login($request);
 
-        $validate = Validator::make($request->all(), $rules);
-        if ($validate->fails()) {
-            return $this->validationErrorResponse($validate->errors());
+        if ($result['status'] == 'error') {
+            return isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->unauthorizedResponse($result['message']);
         }
 
-        $credentials = $request->only('email', 'password');
-
-        if (!$token = Auth::guard('user')->attempt($credentials)) {
-            return $this->apiResponse(401, 'Unauthorized');
-        }
-
-        $user = new UserResource(Auth::guard('user')->user());
-
-        $data = [
-            'user' => $user,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
-            ]
-        ];
-
-        return $this->apiResponse('success', 'You are logged in successfully', $data);
+        return $this->apiResponse('success', 'You are logged in successfully', $result['data']);
     }
 
     public function register(Request $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ];
+        $result = $this->userAuthService->register($request);
 
-        $validate = Validator::make($request->all(), $rules);
-        if ($validate->fails()) {
-            return $this->validationErrorResponse($validate->errors());
+        if ($result['status'] == 'error') {
+            return $this->validationErrorResponse($result['errors']);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new CartEvent($user));
-
-        $token = Auth::guard('user')->login($user);
-
-        $user = new UserResource(Auth::guard('user')->user());
-
-        $data = [
-            'user' => $user,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
-            ]
-        ];
-
-        return $this->createdResponse($data, 'You are registered successfully');
+        return $this->createdResponse($result['data'], 'You are registered successfully');
     }
 
     public function logout()
     {
-        try {
-            Auth::guard('user')->logout();
-            return $this->apiResponse('success', 'User logged out successfully');
-        } catch (Exception $e) {
-            return $this->apiResponse(500, 'Something went wrong', []);
-        }
+        $result = $this->userAuthService->logout();
+        return $this->apiResponse('success', $result['message']);
     }
 
     public function refresh()
     {
-        return response()->json([
-            'token' => Auth::guard('user')->refresh()
-        ]);
+        $result = $this->userAuthService->refresh();
+
+        if ($result['status'] == 'error') {
+            return $this->unauthorizedResponse($result['message']);
+        }
+
+        return $this->apiResponse('success', 'Token refreshed successfully', $result['data']);
     }
 
     public function redirectToGoogle()
     {
-        $loginUrl = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
-
-        return response()->json([
-            'login_url' => $loginUrl,
-        ]);
+        $loginUrl = $this->userAuthService->googleRedirect();
+        return $this->retrievedResponse(['login_url' => $loginUrl], 'login_url of google returned successfully');
     }
 
     public function handleGoogleCallback()
     {
-        try {
-            $userSocial = Socialite::driver('google')->stateless()->user();
+        $result = $this->userAuthService->handleGoogleCallback();
 
-            $user = User::where('email', $userSocial->getEmail())->first();
-
-            if (!$user) {
-                $user = User::create([
-                    'name' => $userSocial->getName(),
-                    'email' => $userSocial->getEmail(),
-                    'google_id' => $userSocial->getId(),
-                    'provider' => 'google',
-                ]);
-
-                event(new CartEvent($user));
-            }
-
-            $token = Auth::guard('user')->login($user);
-            $user = new UserResource($user);
-
-            $data = [
-                'user' => $user,
-                'authorization' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
-                ],
-            ];
-
-            return $this->apiResponse('success', 'You are logged in successfully', $data);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Authentication failed'], 401);
+        if ($result['status'] == 'error') {
+            return $this->unauthorizedResponse($result['message']);
         }
-    }
 
+        return $this->apiResponse('success', 'You are logged in successfully', $result['data']);
+    }
 }

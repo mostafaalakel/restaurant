@@ -4,66 +4,55 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
-use App\Models\Employee;
+use App\Services\Admin\EmployeeService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
     use ApiResponseTrait;
 
+    protected $employeeService;
+
+    public function __construct(EmployeeService $employeeService)
+    {
+        $this->employeeService = $employeeService;
+    }
+
     public function addEmployee(Request $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'salary' => 'required|numeric|min:0',
-            'hire_date' => 'required|date|before_or_equal:today',
-            'position' => 'required|max:255',
-        ];
+        $result = $this->employeeService->addEmployee($request->all());
 
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors());
-        }
-
-        Employee::create($request->all());
-        return $this->createdResponse(null, 'Employee created successfully');
+        return $result['status'] === 'error'
+            ? $this->validationErrorResponse($result['errors'])
+            : $this->createdResponse(null, $result['message']);
     }
 
     public function showEmployees()
     {
-        $employees = Employee::all();
-        return $this->retrievedResponse($employees, 'Employee retrieved successfully');
+        $result = $this->employeeService->showEmployees();
+
+        return $result['status'] === 'error'
+            ? $this->notFoundResponse($result['message'])
+            : $this->retrievedResponse($result['data'], $result['message']);
     }
 
     public function updateEmployee(Request $request, $employeeId)
     {
-        $employee = Employee::findOrFail($employeeId);
+        $result = $this->employeeService->updateEmployee($employeeId, $request->all());
 
-        $rules = [
-            'name' => 'sometimes|required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'salary' => 'sometimes|required|numeric|min:0',
-            'hire_date' => 'sometimes|required|date|before_or_equal:today',
-            'position' => 'sometimes|required|string|max:255'
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return $this->validationErrorResponse($validator->errors());
-        }
-
-        $employee->update($request->all());
-        return $this->updatedResponse(null,'Employee updated successfully');
+        return $result['status'] === 'error'
+            ? (isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->notFoundResponse($result['message']))
+            : $this->updatedResponse(null, $result['message']);
     }
 
     public function deleteEmployee($employeeId)
     {
-        $employee = Employee::findOrFail($employeeId);
-        $employee->delete();
-        return $this->deletedResponse('Employee deleted successfully');
+        $result = $this->employeeService->deleteEmployee($employeeId);
+
+        return $result['status'] === 'error'
+            ? $this->notFoundResponse($result['message'])
+            : $this->deletedResponse($result['message']);
     }
 }

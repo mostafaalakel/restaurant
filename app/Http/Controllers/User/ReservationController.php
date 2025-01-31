@@ -2,94 +2,69 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\User;
-use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ReservationResource;
+use App\Services\User\ReservationService;
 
 class ReservationController extends Controller
 {
-  use ApiResponseTrait;
-  public function createReservation(Request $request)
-  {
+    use ApiResponseTrait;
 
-    $existingReservation = Reservation::where('user_id', Auth::guard('user')->id())
-      ->where('status', 'processing')
-      ->first();
+    protected $reservationService;
 
-    if ($existingReservation) {
-      $existingReservation->delete();
+    public function __construct(ReservationService $reservationService)
+    {
+        $this->reservationService = $reservationService;
     }
 
-    $rules = [
-      'num_people' => 'required|integer|min:1',
-      'reservation_time' => 'required|date_format:Y-m-d H:i:s|after_or_equal:now',
-      'special_request' => 'required|string'
-    ];
+    public function createReservation(Request $request)
+    {
+        $result = $this->reservationService->createReservation($request);
 
-    $validate = Validator::make($request->all(), $rules);
-    if ($validate->fails()) {
-      return $this->validationErrorResponse($validate->errors());
+        if ($result['status'] == 'error') {
+            return isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->apiResponse('error', $result['message']);
+        }
+
+        return $this->createdResponse([], $result['message']);
     }
 
-    $reservation = Reservation::create([
-      'user_id' => Auth::guard('user')->id(),
-      'num_people' => $request->num_people,
-      'reservation_time' => $request->reservation_time,
-      'special_request' => $request->special_request
-    ]);
+    public function showReservation()
+    {
+        $result = $this->reservationService->getReservations();
 
-    if ($reservation) {
-      return $this->createdResponse([], 'Reservation created successfully');
-    } else {
-      return $this->apiResponse(500, 'Failed to create reservation');
-    }
-  }
+        if ($result['status'] == 'error') {
+            return $this->retrievedResponse(null, $result['message']);
+        }
 
-  public function showReservation()
-  {
-    $userReservation = Auth::guard('user')->user()->reservations()->get();
-
-    if (!$userReservation->isEmpty()) {
-      $userReservationResource = ReservationResource::collection($userReservation);
-      return $this->retrievedResponse($userReservationResource, 'Reservation retrieved successfully');
-    } else {
-      return $this->apiResponse(404, 'No reservations found');
-    }
-  }
-
-  public function deleteReservation($reservationId)
-  {
-    $reservation = Reservation::findOrFail($reservationId);
-    $reservation->delete();
-
-    return $this->apiResponse(200, 'Reservation deleted successfully');
-  }
-
-  public function updateReservation(Request $request, $reservationId)
-  {
-    $rules = [
-      'num_people' => 'required|integer|min:1',
-      'reservation_time' => 'required|date_format:Y-m-d H:i:s|after_or_equal:now',
-      'special_request' => 'required|string'
-    ];
-
-    $validate = Validator::make($request->all(), $rules);
-    if ($validate->fails()) {
-      return $this->validationErrorResponse($validate->errors());
+        $userReservationsResource = ReservationResource::collection($result['data']);
+        return $this->retrievedResponse($userReservationsResource, 'Reservations retrieved successfully');
     }
 
-    $reservation = Reservation::findOrFail($reservationId);
-    $reservation->update([
-      'num_people' => $request->num_people,
-      'reservation_time' => $request->reservation_time,
-      'special_request' => $request->special_request
-    ]);
+    public function deleteReservation($reservationId)
+    {
+        $result = $this->reservationService->deleteReservation($reservationId);
 
-    return $this->apiResponse(200, 'Reservation updated successfully');
-  }
+        if ($result['status'] == 'error') {
+            return $this->notFoundResponse($result['message']);
+        }
+
+        return $this->apiResponse('success', $result['message']);
+    }
+
+    public function updateReservation(Request $request, $reservationId)
+    {
+        $result = $this->reservationService->updateReservation($request, $reservationId);
+
+        if ($result['status'] == 'error') {
+            return isset($result['errors'])
+                ? $this->validationErrorResponse($result['errors'])
+                : $this->notFoundResponse($result['message']);
+        }
+
+        return $this->apiResponse('success', $result['message']);
+    }
 }
