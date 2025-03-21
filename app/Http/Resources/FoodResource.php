@@ -17,7 +17,7 @@ class FoodResource extends JsonResource
         $data = [
             'food_id' => $this->id,
             'food_name' => $this->getTranslation('name' , app()->getLocale()),
-            'image_url' => asset(public_path('upload/food_images/'. $this->image)),
+            'image_url' => asset('upload/food_images/' . $this->image),
             'description' => $this->getTranslation('description' , app()->getLocale()),
             'price' => $this->price ." $" ,
             'stock' => $this->stock,
