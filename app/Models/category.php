@@ -13,7 +13,8 @@ class category extends Model
     public $translatable  = ['name'];
 
     protected $fillable = [
-        'name'
+        'name' ,
+        'image'
     ];
 
     public function foods(){

@@ -115,23 +115,24 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::patch('/update-status/{reservation_id}', [\App\Http\Controllers\Admin\ReservationController::class, 'updateReservationStatus']);
     });
 
-    Route::group(['middleware' => 'setLocale'], function () {
+
         // Categories
         Route::prefix('categories')->group(function () {
             Route::get('/show', [\App\Http\Controllers\Admin\CategoryController::class, 'showCategories']);
+            Route::get('/showTranslated', [\App\Http\Controllers\Admin\CategoryController::class, 'showCategoriesTranslated'])->middleware('setLocale');
             Route::post('/add', [\App\Http\Controllers\Admin\CategoryController::class, 'addCategory']);
-            Route::patch('/update/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'updateCategory']);
+            Route::post('/update/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'updateCategory']);
             Route::delete('/delete/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'deleteCategory']);
         });
 
         // Foods
         Route::prefix('foods')->group(function () {
             Route::get('/show', [\App\Http\Controllers\Admin\FoodController::class, 'showFoods']);
+            Route::get('/showTranslated', [\App\Http\Controllers\Admin\FoodController::class, 'showFoodsTranslated'])->middleware('setLocale');
             Route::post('/add', [\App\Http\Controllers\Admin\FoodController::class, 'addFood']);
             Route::patch('/update/{food_id}', [\App\Http\Controllers\Admin\FoodController::class, 'updateFood']);
             Route::delete('/delete/{food_id}', [\App\Http\Controllers\Admin\FoodController::class, 'deleteFood']);
         });
-    });
 
 
     //generalDiscount

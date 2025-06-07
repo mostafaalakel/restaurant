@@ -104,6 +104,20 @@ class FoodService
 
         return ['status' => 'success', 'data' => $foods];
     }
+    public function showFoodsTranslated()
+    {
+        $foods = Food::withAverageRating()->WithGeneralDiscounts()->paginate(10);
+
+        if ($foods->isEmpty()) {
+            return ['status' => 'error', 'message' => 'No foods available'];
+        }
+
+        $foods->through(function ($food) {
+            return $this->applyDiscount($food);
+        });
+
+        return ['status' => 'success', 'data' => $foods];
+    }
 
     private function applyDiscount($food)
     {

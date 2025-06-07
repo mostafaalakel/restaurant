@@ -47,6 +47,17 @@ class CategoryController extends Controller
             : $this->deletedResponse($response['message']);
     }
 
+    public function showCategoriesTranslated()
+    {
+        $result = $this->categoryService->showCategoriesTranslated();
+
+        if ($result['status'] == 'error') {
+            return $this->notFoundResponse($result['message']);
+        }
+
+        return $this->retrievedResponse($result['data'], $result['message']);
+    }
+
     public function showCategories()
     {
         $result = $this->categoryService->showCategories();

@@ -32,5 +32,4 @@ class DiscountResource extends JsonResource
         }
         return $data;
     }
-
 }

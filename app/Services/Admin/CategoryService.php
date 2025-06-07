@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryService
@@ -11,7 +12,15 @@ class CategoryService
     protected array $rules = [
         'name.en' => 'required',
         'name.ar' => 'required',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
     ];
+
+    private function uploadImage($image)
+    {
+        $imageName = time() . '_' . $image->getClientOriginalName();
+        $image->move(public_path('upload/category_images'), $imageName);
+        return $imageName;
+    }
 
     public function addCategory($request)
     {
@@ -31,7 +40,13 @@ class CategoryService
             return ['status' => 'error', 'errors' => $validator->errors()];
         }
 
-        $category = Category::create(['name' => $request->input('name')]);
+//        $request['image'] = $this->uploadImage($request['image']);
+
+        $data = [
+            'name' => $request->input('name'),
+            'image' => $this->uploadImage($request->file('image')),
+        ];
+        $category = Category::create($data);
 
         return $category
             ? ['status' => 'success', 'message' => 'Category added successfully']
@@ -65,6 +80,16 @@ class CategoryService
                 'errors' => $validator->errors()
             ];
         }
+        if ($request->hasFile('image')) {
+            if ($category->image && file_exists(public_path('upload/category_images/' . $category->image))) {
+                unlink(public_path('upload/category_images/' . $category->image));
+            }
+
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->file('image')->move(public_path('upload/category_images'), $imageName);
+            $category->image = $imageName;
+        }
+
 
         $category->update(['name' => $request->input('name')]);
 
@@ -86,10 +111,28 @@ class CategoryService
 
     public function showCategories()
     {
-        $categories = Category::select('id', 'name')->get()->map(function ($category) {
+        $categories = Category::select('id', 'name' , 'image')->get()->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->getTranslation('name', 'en'),
+                'image_url' => url('upload/category_images/' . $category->image),
+            ];
+        });
+
+        if ($categories->isEmpty()) {
+            return ['status' => 'error', 'message' => 'You have no categories yet'];
+        }
+
+        return ['status' => 'success', 'data' => $categories, 'message' => 'Categories retrieved successfully'];
+    }
+
+    public function showCategoriesTranslated()
+    {
+        $categories = Category::select('id', 'name' , 'image')->get()->map(function ($category) {
             return [
                 'id' => $category->id,
                 'name' => $category->getTranslation('name', App::getLocale()),
+                'image_url' => url('upload/category_images/' . $category->image),
             ];
         });
 

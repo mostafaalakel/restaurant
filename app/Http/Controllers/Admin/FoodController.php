@@ -54,4 +54,13 @@ class FoodController extends Controller
             ? $this->notFoundResponse($result['message'])
             : FoodResource::collection($result['data']);
     }
+
+    public function showFoodsTranslated()
+    {
+        $result = $this->foodService->showFoodsTranslated();
+
+        return $result['status'] === 'error'
+            ? $this->notFoundResponse($result['message'])
+            : FoodResource::collection($result['data']);
+    }
 }
