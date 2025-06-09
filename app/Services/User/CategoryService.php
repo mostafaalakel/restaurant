@@ -8,10 +8,11 @@ class CategoryService
 {
   public function getCategories()
   {
-      $categories = Category::select('id', 'name')->get()->map(function ($category) {
+      $categories = Category::select('id', 'name' , 'image')->get()->map(function ($category) {
           return [
               'category_id' => $category->id,
-              'name' => $category->getTranslation('name', app()->getLocale())
+              'name' => $category->getTranslation('name', app()->getLocale()) ,
+              'image_url' => url('upload/category_images/' . $category->image),
           ];
       });
 
