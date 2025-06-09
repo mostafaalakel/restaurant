@@ -65,9 +65,9 @@ class UserAuthController extends Controller
         return $this->retrievedResponse(['login_url' => $loginUrl], 'login_url of google returned successfully');
     }
 
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
-        $result = $this->userAuthService->handleGoogleCallback();
+        $result = $this->userAuthService->handleGoogleCallback($request);
 
         if ($result['status'] == 'error') {
             return $this->unauthorizedResponse($result['message']);
@@ -75,4 +75,6 @@ class UserAuthController extends Controller
 
         return $this->apiResponse('success', 'You are logged in successfully', $result['data']);
     }
+
+
 }

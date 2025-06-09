@@ -92,10 +92,10 @@ class UserAuthService
         return Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
     }
 
-    public function handleGoogleCallback()
+    public function handleGoogleCallback($request)
     {
         try {
-            $userSocial = Socialite::driver('google')->stateless()->user();
+            $userSocial =Socialite::driver('google')->stateless()->userFromToken($request->token);
             $user = User::where('email', $userSocial->getEmail())->first();
 
             if (!$user) {

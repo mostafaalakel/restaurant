@@ -83,8 +83,8 @@ Route::group(["prefix" => 'user'], function () {
     Route::middleware('auth:user')->post('refresh', [UserAuthController::class, 'refresh']);
 });
 
-Route::get('/auth/redirect/google', [UserAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/callback/google', [UserAuthController::class, 'handleGoogleCallback']);
+//Route::get('/auth/redirect/google', [UserAuthController::class, 'redirectToGoogle']);
+Route::post('/auth/callback/google', [UserAuthController::class, 'handleGoogleCallback']);
 Route::get('payment-success/{order}', [OrderController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('payment-cancel/{order}', [OrderController::class, 'paymentCancel'])->name('payment.cancel');
 
