@@ -19,11 +19,30 @@ class DiscountController extends Controller
         $this->discountService = $discountService;
     }
 
+//    public function getAllGeneralDiscounts()
+//    {
+//        $generalDiscounts = $this->discountService->getAllGeneralDiscounts();
+//        return $this->retrievedResponse(DiscountResource::collection($generalDiscounts));
+//    }
+
     public function getAllGeneralDiscounts()
     {
         $generalDiscounts = $this->discountService->getAllGeneralDiscounts();
-        return $this->retrievedResponse(DiscountResource::collection($generalDiscounts));
+
+        $discounts = $generalDiscounts->map(function ($discount) {
+            return [
+                'discount_id' => $discount->id,
+                'discount_name' => $discount->getTranslations('name'),
+                'value' => $discount->value . ' %',
+                'start_date' => $discount->start_date,
+                'end_date' => $discount->end_date,
+                'is_active' => $discount->is_active,
+            ];
+        });
+
+        return $this->retrievedResponse($discounts);
     }
+
 
     public function getAllCodeDiscounts()
     {

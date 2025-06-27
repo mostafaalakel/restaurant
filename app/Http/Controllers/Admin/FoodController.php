@@ -7,6 +7,7 @@ use App\Http\Resources\FoodResource;
 use App\Http\Traits\ApiResponseTrait;
 use App\Services\Admin\FoodService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FoodController extends Controller
 {
@@ -46,13 +47,51 @@ class FoodController extends Controller
             : $this->deletedResponse($result['message']);
     }
 
+//    public function showFoods()
+//    {
+//        $result = $this->foodService->getAllFoods();
+//
+//        return $result['status'] === 'error'
+//            ? $this->notFoundResponse($result['message'])
+//            : FoodResource::collection($result['data']);
+//    }
+
     public function showFoods()
     {
         $result = $this->foodService->getAllFoods();
 
-        return $result['status'] === 'error'
-            ? $this->notFoundResponse($result['message'])
-            : FoodResource::collection($result['data']);
+        if ($result['status'] === 'error') {
+            return $this->notFoundResponse($result['message']);
+        }
+
+        $foods = $result['data']->map(function ($food) {
+            $data = [
+                'food_id' => $food->id,
+                'food_name' => $food->getTranslations('name'),
+                'image_url' => url('upload/food_images/' . $food->image),
+                'description' => $food->getTranslations('description'),
+                'price' => $food->price . " $",
+                'stock' => $food->stock,
+                'average_rating' => $food->average_rating,
+            ];
+
+            if ($food->generalDiscounts->isNotEmpty()) {
+                $data['price_after_discounts'] = $food->price_after_discounts . " $";
+                $data['discounts'] = $food->generalDiscounts->map(function ($discount) {
+                    return [
+                        'discount_id' => $discount->id,
+                        'discount_name' => $discount->getTranslations('name'),
+                        'discount_value' => $discount->value . "%",
+                        'start_date' => $discount->start_date,
+                        'end_date' => $discount->end_date,
+                    ];
+                });
+            }
+
+            return $data;
+        });
+
+        return response()->json($foods);
     }
 
     public function showFoodsTranslated()
