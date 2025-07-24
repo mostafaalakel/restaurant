@@ -25,6 +25,6 @@ class HomeController extends Controller
         $foods->transform(function ($food) {
             return $this->foodService->applyDiscountIfAvailable($food);
         });
-        return $this->retrievedResponse(FoodSummaryResource::collection($foods), 'Food discount retrieved successfully');
+        return $this->retrievedResponse(FoodSummaryResource::collection($foods), 'Food discount retrieved successfullyy');
     }
 }
